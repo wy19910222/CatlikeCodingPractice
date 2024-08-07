@@ -170,7 +170,6 @@ MonoBehaviour:
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
   resolution: 32
-  verticalOffset: 1
   displacement: 0.1
   seed: 0
   domain:
@@ -180,7 +179,7 @@ MonoBehaviour:
       z: 0
     rotation:
       x: 0
-      y: 0
+      y: 30
       z: 0
     scale:
       x: 8
@@ -333,7 +332,6 @@ MonoBehaviour:
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
   resolution: 32
-  verticalOffset: 1
   displacement: 0.1
   seed: 0
   domain:
@@ -343,7 +341,7 @@ MonoBehaviour:
       z: 0
     rotation:
       x: 0
-      y: 0
+      y: 30
       z: 0
     scale:
       x: 8
@@ -540,7 +538,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2009949342}
-  - component: {fileID: 2009949343}
+  - component: {fileID: 2009949344}
   m_Layer: 0
   m_Name: HashingSpace_Vectorization_MoreShape
   m_TagString: Untagged
@@ -563,7 +561,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2009949343
+--- !u!114 &2009949344
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -589,7 +587,7 @@ MonoBehaviour:
       z: 0
     rotation:
       x: 0
-      y: 0
+      y: 30
       z: 0
     scale:
       x: 8
