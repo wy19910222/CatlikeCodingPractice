@@ -106,7 +106,7 @@ namespace HashingSpace {
 				Point4 p = default(S).GetPoint4(i, resolution, invResolution);
 	
 				positions[i] = math.transpose(TransformVectors(positionTRS, p.positions));
-				float3x4 n = math.transpose(TransformVectors(normalTRS, p.positions, 0f));
+				float3x4 n = math.transpose(TransformVectors(normalTRS, p.normals, 0f));
 				normals[i] = math.float3x4(math.normalize(n.c0), math.normalize(n.c1), math.normalize(n.c2), math.normalize(n.c3));
 			}
 			
