@@ -95,18 +95,12 @@ namespace ValueNoise {
 			public float resolution, invResolution;
 	
 			public float3x4 positionTRS, normalTRS;
-			
-			private float4x3 TransformVectors(float3x4 trs, float4x3 p, float w = 1f) => math.float4x3(
-					trs.c0.x * p.c0 + trs.c1.x * p.c1 + trs.c2.x * p.c2 + trs.c3.x * w,
-					trs.c0.y * p.c0 + trs.c1.y * p.c1 + trs.c2.y * p.c2 + trs.c3.y * w,
-					trs.c0.z * p.c0 + trs.c1.z * p.c1 + trs.c2.z * p.c2 + trs.c3.z * w
-			);
 	
 			public void Execute (int i) {
 				Point4 p = default(S).GetPoint4(i, resolution, invResolution);
 	
-				positions[i] = math.transpose(TransformVectors(positionTRS, p.positions));
-				float3x4 n = math.transpose(TransformVectors(normalTRS, p.normals, 0f));
+				positions[i] = math.transpose(positionTRS.TransformVectors( p.positions));
+				float3x4 n = math.transpose(normalTRS.TransformVectors(p.normals, 0f));
 				normals[i] = math.float3x4(math.normalize(n.c0), math.normalize(n.c1), math.normalize(n.c2), math.normalize(n.c3));
 			}
 			
@@ -117,8 +111,8 @@ namespace ValueNoise {
 					normals = normals,
 					resolution = resolution,
 					invResolution = 1f / resolution,
-					positionTRS = math.float3x4(trs.c0.xyz, trs.c1.xyz, trs.c2.xyz, trs.c3.xyz),
-					normalTRS = math.float3x4(tim.c0.xyz, tim.c1.xyz, tim.c2.xyz, tim.c3.xyz)
+					positionTRS = trs.Get3x4(),
+					normalTRS = math.transpose(math.inverse(trs)).Get3x4()
 				}.ScheduleParallel(positions.Length, resolution, dependency);
 			}
 		}

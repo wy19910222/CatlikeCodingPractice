@@ -18,7 +18,7 @@ namespace ValueNoise {
 		[SerializeField, Range(0.1f, 10f)]
 		private float instanceScale = 2f;
 		[SerializeField, Range(1, 512)]
-		private int resolution = 16;
+		private int resolution = 64;
 		[SerializeField, Range(-0.5f, 0.5f)]
 		private float displacement = 0.1f;
 	

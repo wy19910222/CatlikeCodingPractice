@@ -20,7 +20,7 @@ void ConfigureProcedural() {
 	#endif
 }
 
-float3 GetHashColor () {
+float3 GetHashColor() {
 	#if defined(UNITY_PROCEDURAL_INSTANCING_ENABLED)
 		uint hash = _Hashes[unity_InstanceID];
 		return (1.0 / 255.0) * float3(
