@@ -69,14 +69,14 @@ namespace HashingSpace {
 		private bool isDirty;
 		private Bounds bounds;
 	
-		void OnValidate () {
+		void OnValidate() {
 			if (hashesBuffer != null && enabled) {
 				OnDisable();
 				OnEnable();
 			}
 		}
 		
-		void OnEnable () {
+		void OnEnable() {
 			isDirty = true;
 			
 			int length = resolution * resolution;
@@ -95,7 +95,7 @@ namespace HashingSpace {
 			propertyBlock.SetVector(configId, new Vector4(resolution, instanceScale / resolution, displacement));
 		}
 		
-		void OnDisable () {
+		void OnDisable() {
 			hashes.Dispose();
 			positions.Dispose();
 			normals.Dispose();
@@ -107,7 +107,7 @@ namespace HashingSpace {
 			normalsBuffer = null;
 		}
 		
-		void Update () {
+		void Update() {
 			Transform trans = transform;
 			if (isDirty || trans.hasChanged) {
 				isDirty = false;
