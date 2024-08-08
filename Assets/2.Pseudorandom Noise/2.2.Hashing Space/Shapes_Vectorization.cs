@@ -4,7 +4,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace HashingSpace {
-	public static class Shape_Vectorization {
+	public static class Shapes_Vectorization {
 		[BurstCompile(FloatPrecision.Standard, FloatMode.Fast, CompileSynchronously = true)]
 		public struct Job : IJobFor {
 			[WriteOnly]

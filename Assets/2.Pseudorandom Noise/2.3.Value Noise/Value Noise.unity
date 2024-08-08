@@ -170,7 +170,6 @@ MonoBehaviour:
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
   resolution: 32
-  verticalOffset: 1
   displacement: 0.1
   seed: 0
   domain:
@@ -333,7 +332,6 @@ MonoBehaviour:
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
   resolution: 32
-  verticalOffset: 1
   displacement: 0.1
   seed: 0
   domain:
@@ -380,7 +378,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &547007656
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,7 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
-  shape: 0
+  shape: 2
   instanceScale: 2
   resolution: 64
   displacement: 0.1
@@ -611,7 +609,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2009949342
 Transform:
   m_ObjectHideFlags: 0
@@ -641,7 +639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 38c3922eb704a674fb4951271a694f6f, type: 2}
-  shape: 0
+  shape: 2
   instanceScale: 2
   resolution: 64
   displacement: 0.1

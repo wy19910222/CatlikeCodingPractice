@@ -44,7 +44,7 @@ namespace HashingSpace {
 		[SerializeField]
 		private Material material;
 		[SerializeField]
-		private Shape_Vectorization_MoreShapes.Shape shape;
+		private Shapes_Vectorization_MoreShapes.Shape shape;
 		[SerializeField, Range(0.1f, 10f)]
 		private float instanceScale = 2f;
 		[SerializeField, Range(1, 512)]
@@ -113,7 +113,7 @@ namespace HashingSpace {
 				isDirty = false;
 				trans.hasChanged = false;
 	
-				JobHandle handle = Shape_Vectorization_MoreShapes.shapeJobs[(int)shape](positions, normals, resolution, trans.localToWorldMatrix, default);
+				JobHandle handle = Shapes_Vectorization_MoreShapes.shapeJobs[(int)shape](positions, normals, resolution, trans.localToWorldMatrix, default);
 				new HashJob {
 					positions = positions,
 					hashes = hashes,

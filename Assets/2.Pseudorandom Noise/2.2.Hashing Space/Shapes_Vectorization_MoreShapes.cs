@@ -4,7 +4,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace HashingSpace {
-	public static class Shape_Vectorization_MoreShapes {
+	public static class Shapes_Vectorization_MoreShapes {
 		public enum Shape { Plane, Sphere, Torus }
 		
 		public static readonly ScheduleDelegate[] shapeJobs = {

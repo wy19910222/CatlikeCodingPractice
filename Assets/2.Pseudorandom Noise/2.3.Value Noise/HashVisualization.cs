@@ -4,8 +4,8 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace HashingSpace {
-	public class HashVisualization_Vectorization : MonoBehaviour {
+namespace ValueNoise {
+	public class HashVisualization : MonoBehaviour {
 		[BurstCompile(FloatPrecision.Standard, FloatMode.Fast, CompileSynchronously = true)]
 		private struct HashJob : IJobFor {
 			[ReadOnly]
@@ -43,6 +43,10 @@ namespace HashingSpace {
 		private Mesh instanceMesh;
 		[SerializeField]
 		private Material material;
+		[SerializeField]
+		private Shapes.Shape shape;
+		[SerializeField, Range(0.1f, 10f)]
+		private float instanceScale = 2f;
 		[SerializeField, Range(1, 512)]
 		private int resolution = 16;
 		[SerializeField, Range(-0.5f, 0.5f)]
@@ -88,7 +92,7 @@ namespace HashingSpace {
 			propertyBlock.SetBuffer(hashesId, hashesBuffer);
 			propertyBlock.SetBuffer(positionsId, positionsBuffer);
 			propertyBlock.SetBuffer(normalsId, normalsBuffer);
-			propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, displacement));
+			propertyBlock.SetVector(configId, new Vector4(resolution, instanceScale / resolution, displacement));
 		}
 		
 		void OnDisable () {
@@ -109,7 +113,7 @@ namespace HashingSpace {
 				isDirty = false;
 				trans.hasChanged = false;
 	
-				JobHandle handle = Shapes_Vectorization.Job.ScheduleParallel(positions, normals, resolution, trans.localToWorldMatrix, default);
+				JobHandle handle = Shapes.shapeJobs[(int)shape](positions, normals, resolution, trans.localToWorldMatrix, default);
 				new HashJob {
 					positions = positions,
 					hashes = hashes,
