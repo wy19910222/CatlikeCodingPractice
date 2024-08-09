@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -10,6 +9,8 @@ namespace ValueNoise {
 	
 		[SerializeField]
 		private int seed;
+		[SerializeField, Range(1, 3)]
+		private int dimensions = 3;
 		[SerializeField]
 		private SpaceTRS domain = new SpaceTRS {
 			scale = 8f
@@ -31,7 +32,7 @@ namespace ValueNoise {
 		}
 		
 		protected override void UpdateVisualization(NativeArray<float3x4> positions, int resolution, JobHandle handle) {
-			handle.Complete();
+			Noise.noiseJobs[dimensions - 1](positions, noise, seed, domain, resolution, handle).Complete();
 			noiseBuffer.SetData(noise.Reinterpret<float>(4 * 4));
 		}
 	}
