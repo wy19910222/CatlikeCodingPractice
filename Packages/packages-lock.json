@@ -83,6 +83,17 @@
       "dependencies": {},
       "url": "https://packages.unity.cn"
     },
+    "com.unity.probuilder": {
+      "version": "5.1.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.settings-manager": "1.0.3",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "url": "https://packages.unity.cn"
+    },
     "com.unity.render-pipelines.core": {
       "version": "12.1.12",
       "depth": 1,
@@ -113,7 +124,7 @@
     },
     "com.unity.settings-manager": {
       "version": "1.0.3",
-      "depth": 2,
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.cn"
@@ -188,12 +199,12 @@
       },
       "url": "https://packages.unity.cn"
     },
-    "com.wy.tools.image_cropping": {
-      "version": "git@gitee.com:wy19910222/Unity-Tools.git?path=Assets/Tools/ImageCropping",
+    "com.wy.tools.batch_rename": {
+      "version": "git@github.com:wy19910222/Unity-Tools.git?path=Assets/Tools/BatchRename",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "67971c4fdf1306868c4cff711ce6c249c5ad24d8"
+      "hash": "77b29e5adb6ba165a802bc8a826fddccfcd27942"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
