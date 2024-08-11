@@ -1,12 +1,13 @@
-using System;
 using UnityEngine;
 
-namespace Physics {
+namespace PhysicsUsing {
 	public class MovingSphere : MonoBehaviour {
+		private static readonly int baseColorId = Shader.PropertyToID("_BaseColor");
+		
 		[SerializeField, Range(0f, 100f)] private float maxSpeed = 10f;
 		[SerializeField, Range(0f, 100f)] private float maxAcceleration = 10f, maxAirAcceleration = 1f;
 		[SerializeField, Range(0f, 10f)] private float jumpHeight = 2f;
-		[SerializeField, Range(0, 5)] private int maxAirJumps = 0;
+		[SerializeField, Range(0, 5)] private int maxAirJumps;
 		[SerializeField, Range(0f, 90f)] private float maxGroundAngle = 25f;
 	
 		private Vector3 velocity, desiredVelocity;
@@ -16,7 +17,7 @@ namespace Physics {
 		private int jumpPhase;
 		private float minGroundDotProduct;
 		private Vector3 contactNormal;
-		
+
 		private bool OnGround => groundContactCount > 0;
 
 		private void OnValidate () {
@@ -35,7 +36,7 @@ namespace Physics {
 			playerInput = Vector2.ClampMagnitude(playerInput, 1f);
 			desiredVelocity = new Vector3(playerInput.x, 0f, playerInput.y) * maxSpeed;
 			desiredJump |= Input.GetButtonDown("Jump");
-			GetComponent<Renderer>().material.SetColor("_BaseColor", Color.white * (groundContactCount * 0.25f));
+			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 		}
 		
 		private void FixedUpdate() {
@@ -69,7 +70,7 @@ namespace Physics {
 		private void Jump() {
 			if (OnGround || jumpPhase < maxAirJumps) {
 				jumpPhase += 1;
-				float jumpSpeed = Mathf.Sqrt(- 2f * UnityEngine.Physics.gravity.y * jumpHeight);
+				float jumpSpeed = Mathf.Sqrt(- 2f * Physics.gravity.y * jumpHeight);
 				float alignedSpeed = Vector3.Dot(velocity, contactNormal);
 				if (alignedSpeed > 0f) {
 					jumpSpeed = Mathf.Max(jumpSpeed - alignedSpeed, 0f);
