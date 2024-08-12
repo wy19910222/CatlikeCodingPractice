@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 549b62ad6e3c6f949b8c9a6c65d250b7, type: 2}
+  - {fileID: 2100000, guid: 54412c7ccbf5a0743b083ebb69e34a79, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -94,7 +94,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5593592556152845971}
-  m_Material: {fileID: 13400000, guid: 737817ab2f4c5ce4cae8d259b96bf269, type: 2}
+  m_Material: {fileID: 13400000, guid: 04cd1ee85ed969c48a1da6d95565161c, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -121,7 +121,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9cda380784020a242b8f2c899f6f5987, type: 2}
+  - {fileID: 2100000, guid: ad636d1bed1cf3c47be5cf0f9a4ab16a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
