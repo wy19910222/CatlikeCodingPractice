@@ -227,13 +227,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a620fa79bbb4d34b9d7c36e00f86aaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInputSpace: {fileID: 0}
   maxSpeed: 10
   maxAcceleration: 80
   maxAirAcceleration: 20
   jumpHeight: 3
-  maxAirJumps: 0
+  maxAirJumps: 1
   maxGroundAngle: 25
-  maxStairsAngle: 50
+  maxStairsAngle: 45
   maxSnapSpeed: 100
   probeDistance: 1
   maxDropSpeed: 30

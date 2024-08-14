@@ -1,11 +1,4 @@
-﻿/*
- * @Author: wangyun
- * @CreateTime: 2024-08-12 15:20:07 862
- * @LastEditor: wangyun
- * @EditTime: 2024-08-12 15:20:07 866
- */
-
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace OrbitCamera {
 	[RequireComponent(typeof(Camera))]
