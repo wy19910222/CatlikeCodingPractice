@@ -121,11 +121,13 @@ namespace ComplexGravity {
 			
 			if (outerDistance > 0f) {
 				Gizmos.color = Color.yellow;
-				DrawGizmosOuterCube(outerDistance);
+				// DrawGizmosOuterCube(outerDistance);
+				DrawExtendedWireCube(Vector3.zero, boundaryDistance * 2, outerDistance);
 			}
 			if (outerFalloffDistance > outerDistance) {
 				Gizmos.color = Color.cyan;
-				DrawGizmosOuterCube(outerFalloffDistance);
+				// DrawGizmosOuterCube(outerFalloffDistance);
+				DrawExtendedWireCube(Vector3.zero, boundaryDistance * 2, outerFalloffDistance);
 			}
 		}
 
@@ -171,6 +173,140 @@ namespace ComplexGravity {
 			Gizmos.DrawLine(b, c);
 			Gizmos.DrawLine(c, d);
 			Gizmos.DrawLine(d, a);
+		}
+
+		private static void DrawExtendedWireCube(Vector3 center, Vector3 size, float extent, bool detailed = false) {
+			if (extent <= 0) {
+				Gizmos.DrawWireCube(center, size);
+				return;
+			}
+			size *= 0.5F;
+			const float INV_SQRT_2 = 0.7071F;
+			
+			// 6个面
+			Vector3 a, b, c, d;
+			a.y = b.y = size.y;
+			d.y = c.y = -size.y;
+			b.z = c.z = size.z;
+			d.z = a.z = -size.z;
+			a.x = b.x = c.x = d.x = size.x + extent;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+			a.x = b.x = c.x = d.x = -a.x;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+			a.x = b.x = size.x;
+			d.x = c.x = -size.x;
+			b.z = c.z = size.z;
+			d.z = a.z = -size.z;
+			a.y = b.y = c.y = d.y = size.y + extent;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+			a.y = b.y = c.y = d.y = -a.y;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+			a.x = b.x = size.x;
+			d.x = c.x = -size.x;
+			b.y = c.y = size.y;
+			d.y = a.y = -size.y;
+			a.z = b.z = c.z = d.z = size.z + extent;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+			a.z = b.z = c.z = d.z = -a.z;
+			Gizmos.DrawLine(a, b);
+			Gizmos.DrawLine(b, c);
+			Gizmos.DrawLine(c, d);
+			Gizmos.DrawLine(d, a);
+
+			// 8个角上的圆弧三角形
+			Vector3 cornerCenter = size;
+			Vector3[] cornerTypes = {
+				Vector3.one,
+				new Vector3(-1, 1, 1),
+				new Vector3(1, -1, 1),
+				new Vector3(-1, -1, 1),
+				new Vector3(1, 1, -1),
+				new Vector3(-1, 1, -1),
+				new Vector3(1, -1, -1),
+				-Vector3.one,
+			};
+			const int ARC_SEGMENT_COUNT = 10;
+			for (int axis = 0; axis < 3; ++axis) {
+				Vector3 rotateAxis = Vector3.zero;
+				rotateAxis[axis] = 1;
+				Vector3 direction = Vector3.zero;
+				direction[axis == 2 ? 0 : axis + 1] = extent;
+				Vector3 temp1 = cornerCenter + direction;
+				for (int i = 1; i <= ARC_SEGMENT_COUNT; ++i) {
+					Vector3 temp2 = cornerCenter + Quaternion.AngleAxis(i * 90F / ARC_SEGMENT_COUNT, rotateAxis) * direction;
+					for (int j = 0; j < 8; ++j) {
+						Gizmos.DrawLine(Vector3.Scale(temp1, cornerTypes[j]), Vector3.Scale(temp2, cornerTypes[j]));
+					}
+					temp1 = temp2;
+				}
+			}
+
+			if (detailed) {
+				// 12条棱
+				Vector3 e, f;
+				float extent2 = extent * INV_SQRT_2;
+				
+				a.x = -size.x;
+				b.x = size.x;
+				c.x = d.x = e.x = f.x = size.x + extent2;
+				c.y = -size.y;
+				d.y = size.y;
+				a.y = b.y = e.y = f.y = size.y + extent2;
+				e.z = -size.z;
+				f.z = size.z;
+				a.z = b.z = c.z = d.z = size.z + extent2;
+				Gizmos.DrawLine(a, b);
+				Gizmos.DrawLine(c, d);
+				Gizmos.DrawLine(e, f);
+				c.x = d.x = e.x = f.x = -c.x;
+				a.z = b.z = c.z = d.z = -a.z;
+				Gizmos.DrawLine(a, b);
+				Gizmos.DrawLine(c, d);
+				Gizmos.DrawLine(e, f);
+				c.x = d.x = e.x = f.x = -c.x;
+				a.y = b.y = e.y = f.y = -a.y;
+				Gizmos.DrawLine(a, b);
+				Gizmos.DrawLine(c, d);
+				Gizmos.DrawLine(e, f);
+				c.x = d.x = e.x = f.x = -c.x;
+				a.z = b.z = c.z = d.z = -a.z;
+				Gizmos.DrawLine(a, b);
+				Gizmos.DrawLine(c, d);
+				Gizmos.DrawLine(e, f);
+				
+				// 8个角上的圆弧棱
+				for (int axis = 0; axis < 3; ++axis) {
+					Vector3 rotateAxis = Vector3.zero;
+					rotateAxis[axis] = INV_SQRT_2;
+					rotateAxis[axis == 2 ? 0 : axis + 1] = -INV_SQRT_2;
+					Vector3 direction = Vector3.zero;
+					direction[axis] = extent2;
+					direction[axis == 2 ? 0 : axis + 1] = extent2;
+					Vector3 temp1 = cornerCenter + direction;
+					for (int i = 1; i <= ARC_SEGMENT_COUNT; ++i) {
+						Vector3 temp2 = cornerCenter + Quaternion.AngleAxis(i * 90F / ARC_SEGMENT_COUNT, rotateAxis) * direction;
+						for (int j = 0; j < 8; ++j) {
+							Gizmos.DrawLine(Vector3.Scale(temp1, cornerTypes[j]), Vector3.Scale(temp2, cornerTypes[j]));
+						}
+						temp1 = temp2;
+					}
+				}
+			}
 		}
 	}
 }
