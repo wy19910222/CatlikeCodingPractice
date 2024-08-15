@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿// @Author: wangyun
+// @CreateTime: 2024-08-15 2:42
+// @LastEditor: wangyun
+// @EditTime: 2024-08-15 5:19
+
+using UnityEngine;
 
 namespace CustomGravity {
 	[RequireComponent(typeof(Camera))]
@@ -7,6 +12,7 @@ namespace CustomGravity {
 		[SerializeField, Range(1f, 20f)] private float distance = 5f;
 		[SerializeField, Min(0f)] private float focusRadius = 1f;
 		[SerializeField, Range(0f, 1f)] private float focusCentering = 0.5f;
+		[SerializeField, Range(0.5f, 10f)] private float sensitivityH = 5f, sensitivityV = 5f;
 		[SerializeField, Range(1f, 360f)] private float rotationSpeed = 90f;
 		[SerializeField, Range(-89f, 89f)] private float minVerticalAngle = -30f, maxVerticalAngle = 60f;
 		[SerializeField, Min(0f)] private float alignDelay = 5f;
@@ -86,8 +92,8 @@ namespace CustomGravity {
 			}
 		}
 
-		private bool ManualRotation () {
-			Vector2 input = new Vector2(-Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"));
+		private bool ManualRotation() {
+			Vector2 input = new Vector2(-Input.GetAxis("Mouse Y") * sensitivityV, Input.GetAxis("Mouse X") * sensitivityH);
 			const float e = 0.001f;
 			if (input.x < -e || input.x > e || input.y < -e || input.y > e) {
 				orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;
