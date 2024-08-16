@@ -181,7 +181,6 @@ namespace ComplexGravity {
 				return;
 			}
 			size *= 0.5F;
-			const float INV_SQRT_2 = 0.7071F;
 			
 			// 6个面
 			Vector3 a, b, c, d;
@@ -257,10 +256,11 @@ namespace ComplexGravity {
 			}
 
 			if (detailed) {
-				// 12条棱
-				Vector3 e, f;
+				const float INV_SQRT_2 = 0.7071F;
 				float extent2 = extent * INV_SQRT_2;
 				
+				// 12条棱
+				Vector3 e, f;
 				a.x = -size.x;
 				b.x = size.x;
 				c.x = d.x = e.x = f.x = size.x + extent2;
