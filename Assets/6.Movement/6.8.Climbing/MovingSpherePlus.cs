@@ -2,7 +2,7 @@
  * @Author: wangyun
  * @CreateTime: 2024-08-12 15:20:07 862
  * @LastEditor: wangyun
- * @EditTime: 2024-08-12 15:20:07 866
+ * @EditTime: 2024-08-20 16:43:07 866
  */
 
 using UnityEngine;
@@ -66,7 +66,7 @@ namespace Climbing {
 				forwardAxis = ProjectDirectionOnPlane(Vector3.forward, upAxis);
 			}
 			desiredJump |= Input.GetButtonDown("Jump");
-			desiresClimbing = Input.GetButton("Climb");
+			desiresClimbing = Input.GetButton("Climb") || Input.GetAxis("Climb") > 0;
 			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 			
 			meshRenderer.material = Climbing ? climbingMaterial : normalMaterial;
