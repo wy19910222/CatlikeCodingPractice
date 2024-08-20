@@ -231,7 +231,7 @@ MonoBehaviour:
   maxSpeed: 10
   maxAcceleration: 80
   maxAirAcceleration: 20
-  jumpHeight: 3
+  jumpHeight: 2
   maxAirJumps: 1
   maxGroundAngle: 25
   maxStairsAngle: 45
