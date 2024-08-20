@@ -109,9 +109,9 @@ InputManager:
     positiveButton: left shift
     altNegativeButton: 
     altPositiveButton: right shift
-    gravity: 1000
+    gravity: 3
     dead: 0.001
-    sensitivity: 1000
+    sensitivity: 3
     snap: 0
     invert: 0
     type: 2
@@ -269,9 +269,9 @@ InputManager:
     positiveButton: left shift
     altNegativeButton: 
     altPositiveButton: right shift
-    gravity: 1000
+    gravity: 3
     dead: 0.001
-    sensitivity: 1000
+    sensitivity: 3
     snap: 0
     invert: 0
     type: 2
