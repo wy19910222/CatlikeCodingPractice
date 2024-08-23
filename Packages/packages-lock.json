@@ -199,12 +199,26 @@
       },
       "url": "https://packages.unity.cn"
     },
-    "com.wy.tools.batch_rename": {
+    "com.wy.tools.batch-rename": {
       "version": "git@github.com:wy19910222/Unity-Tools.git?path=Assets/Tools/BatchRename",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "77b29e5adb6ba165a802bc8a826fddccfcd27942"
+      "hash": "239ff8fd76df1203578f7d0bb0c59ed5f38e5029"
+    },
+    "com.wy.tools.reference-replace": {
+      "version": "git@github.com:wy19910222/Unity-Tools.git?path=Assets/Tools/ReferenceReplace",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "594eaaa9b0111880ff00a515789869d215356f4b"
+    },
+    "com.wy.tools.transform-inspector": {
+      "version": "git@github.com:wy19910222/Unity-Tools.git?path=Assets/Tools/TransformInspector",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "dcbdee7bebfa8b3173157a5ed0eaaaab2ac53212"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
