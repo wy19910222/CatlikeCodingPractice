@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿// @Author: wangyun
+// @CreateTime: 2024-08-20 17:11
+// @LastEditor: wangyun
+// @EditTime: 2024-08-21 16:52
+
+using UnityEngine;
 
 namespace Swimming {
 	[RequireComponent(typeof(Camera))]
@@ -63,7 +68,7 @@ namespace Swimming {
 			Vector3 castDirection = castLine / castDistance;
 			
 			if (Physics.BoxCast(castFrom, CameraHalfExtends, castDirection, out RaycastHit hit,
-					lookRotation, castDistance, obstructionMask)) {
+					lookRotation, castDistance, obstructionMask, QueryTriggerInteraction.Ignore)) {
 				rectPosition = castFrom + castDirection * hit.distance;
 				lookPosition = rectPosition - rectOffset;
 			}

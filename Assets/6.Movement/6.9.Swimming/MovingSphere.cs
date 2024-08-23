@@ -5,18 +5,23 @@ namespace Swimming {
 		private static readonly int baseColorId = Shader.PropertyToID("_BaseColor");
 		
 		[SerializeField] private Transform playerInputSpace;
-		[SerializeField, Range(0f, 100f)] private float maxSpeed = 10f, maxClimbSpeed = 4f;
-		[SerializeField, Range(0f, 100f)] private float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 40f;
+		[SerializeField, Range(0f, 100f)] private float maxSpeed = 10f, maxClimbSpeed = 4f, maxSwimSpeed = 5f;
+		[SerializeField, Range(0f, 100f)] private float maxAcceleration = 10f, maxAirAcceleration = 1f, maxClimbAcceleration = 40f, maxSwimAcceleration = 5f;
 		[SerializeField, Range(0f, 10f)] private float jumpHeight = 2f;
 		[SerializeField, Range(0, 5)] private int maxAirJumps;
 		[SerializeField, Range(0f, 90f)] private float maxGroundAngle = 25f, maxStairsAngle = 50f;
 		[SerializeField, Range(90, 180)] private float maxClimbAngle = 140f;
 		[SerializeField, Range(0f, 100f)] private float maxSnapSpeed = 100f;
 		[SerializeField, Min(0f)] private float probeDistance = 1f;
-		[SerializeField] private LayerMask probeMask = -1, stairsMask = -1, climbMask = -1;
-		[SerializeField] private Material normalMaterial, climbingMaterial;
+		[SerializeField] private float submergenceOffset = 0.5f;
+		[SerializeField, Min(0.1f)] private float submergenceRange = 1f;
+		[SerializeField, Min(0f)] private float buoyancy = 1f;
+		[SerializeField, Range(0f, 10f)] private float waterDrag = 1f;
+		[SerializeField, Range(0.01f, 1f)] private float swimThreshold = 0.5f;
+		[SerializeField] private LayerMask probeMask = -1, stairsMask = -1, climbMask = -1, waterMask = 0;
+		[SerializeField] private Material normalMaterial, climbingMaterial, swimmingMaterial;
 
-		private Vector2 playerInput;
+		private Vector3 playerInput;
 		private Vector3 velocity, connectionVelocity;
 		private Rigidbody body, connectedBody, previousConnectedBody;
 		private bool desiredJump, desiresClimbing;
@@ -28,10 +33,13 @@ namespace Swimming {
 		private Vector3 upAxis, rightAxis, forwardAxis;
 		private Vector3 connectionWorldPosition, connectionLocalPosition;
 		private MeshRenderer meshRenderer;
+		private float submergence;
 		
 		private bool OnGround => groundContactCount > 0;
 		private bool OnSteep => steepContactCount > 0;
 		private bool Climbing => climbContactCount > 0 && stepsSinceLastJump > 2;
+		private bool InWater => submergence > 0f;
+		private bool Swimming => submergence >= swimThreshold;
 
 		private void OnValidate () {
 			minGroundDotProduct = Mathf.Cos(maxGroundAngle * Mathf.Deg2Rad);
@@ -49,7 +57,9 @@ namespace Swimming {
 		private void Update() {
 			playerInput.x = Input.GetAxis("Horizontal");
 			playerInput.y = Input.GetAxis("Vertical");
-			playerInput = Vector2.ClampMagnitude(playerInput, 1f);
+			// TODO: 这里设计是在水中上下移动，但一般设计应该是自然往下沉，跳一下就往上游一点。
+			playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+			playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 			if (playerInputSpace) {
 				rightAxis = ProjectDirectionOnPlane(playerInputSpace.right, upAxis);
 				forwardAxis = ProjectDirectionOnPlane(playerInputSpace.forward, upAxis);
@@ -57,16 +67,24 @@ namespace Swimming {
 				rightAxis = ProjectDirectionOnPlane(Vector3.right, upAxis);
 				forwardAxis = ProjectDirectionOnPlane(Vector3.forward, upAxis);
 			}
-			desiredJump |= Input.GetButtonDown("Jump");
-			desiresClimbing = Input.GetButton("Climb");
+			if (Swimming) {
+				desiresClimbing = false;
+			} else {
+				// TODO: 这里是在游泳时不允许跳跃，但一般设计应该是允许跳出水面的。
+				desiredJump |= Input.GetButtonDown("Jump");
+				desiresClimbing = Input.GetButton("Climb");
+			}
 			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 			
-			meshRenderer.material = Climbing ? climbingMaterial : normalMaterial;
+			meshRenderer.material = Climbing ? climbingMaterial : Swimming ? swimmingMaterial : normalMaterial;
 		}
 		
 		private void FixedUpdate() {
 			Vector3 gravity = CustomGravity.GetGravity(body.position, out upAxis);
 			UpdateState();
+			if (InWater) {
+				velocity *= Mathf.Max(1f - waterDrag * submergence * Time.deltaTime, 0);
+			}
 			AdjustVelocity();
 			if (desiredJump) {
 				desiredJump = false;
@@ -74,6 +92,8 @@ namespace Swimming {
 			}
 			if (Climbing) {
 				velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
+			} else if (InWater) {
+				velocity += gravity * ((1f - buoyancy * submergence) * Time.deltaTime);
 			} else if (OnGround && velocity.sqrMagnitude < 0.01f) {
 				velocity += contactNormal * (Vector3.Dot(gravity, contactNormal) * Time.deltaTime);
 			} else if (desiresClimbing && OnGround) {
@@ -91,13 +111,14 @@ namespace Swimming {
 			connectionVelocity = Vector3.zero;
 			previousConnectedBody = connectedBody;
 			connectedBody = null;
+			submergence = 0f;
 		}
 
 		private void UpdateState() {
 			stepsSinceLastGrounded += 1;
 			stepsSinceLastJump += 1;
 			velocity = body.velocity;
-			if (CheckClimbing() || OnGround || SnapToGround() || CheckSteepContacts()) {
+			if (CheckClimbing() || CheckSwimming() || OnGround || SnapToGround() || CheckSteepContacts()) {
 				stepsSinceLastGrounded = 0;
 				if (stepsSinceLastJump > 1) {
 					jumpPhase = 0;
@@ -142,6 +163,9 @@ namespace Swimming {
 			stepsSinceLastJump = 0;
 			jumpPhase += 1;
 			float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
+			if (InWater) {
+				jumpSpeed *= Mathf.Max(0f, 1f - submergence / swimThreshold);
+			}
 			jumpDirection = (jumpDirection + upAxis).normalized;
 			float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
 			if (alignedSpeed > 0f) {
@@ -159,6 +183,9 @@ namespace Swimming {
 		}
 
 		private void EvaluateCollision(Collision collision) {
+			if (Swimming) {
+				return;
+			}
 			int layer = collision.gameObject.layer;
 			float minDot = GetMinDot(layer);
 			for (int i = 0; i < collision.contactCount; i++) {
@@ -186,6 +213,30 @@ namespace Swimming {
 			}
 		}
 
+		private void OnTriggerEnter(Collider other) {
+			if ((waterMask & 1 << other.gameObject.layer) != 0) {
+				EvaluateSubmergence(other);
+			}
+		}
+
+		private void OnTriggerStay(Collider other) {
+			if ((waterMask & 1 << other.gameObject.layer) != 0) {
+				EvaluateSubmergence(other);
+			}
+		}
+
+		private void EvaluateSubmergence(Collider other) {
+			if (Physics.Raycast(body.position + upAxis * submergenceOffset, -upAxis, out RaycastHit hit,
+					submergenceRange + 1f, waterMask, QueryTriggerInteraction.Collide)) {
+				submergence = 1f - hit.distance / submergenceRange;
+			} else {
+				submergence = 1f;
+			}
+			if (Swimming) {
+				connectedBody = other.attachedRigidbody;
+			}
+		}
+
 		private Vector3 ProjectDirectionOnPlane(Vector3 direction, Vector3 normal) {
 			return (direction - normal * Vector3.Dot(direction, normal)).normalized;
 		}
@@ -198,6 +249,12 @@ namespace Swimming {
 				speed = maxClimbSpeed;
 				xAxis = Vector3.Cross(contactNormal, upAxis);
 				zAxis = upAxis;
+			} else if (Swimming) {
+				float swimFactor = Mathf.Min(1f, submergence / swimThreshold);
+				acceleration = Mathf.LerpUnclamped(OnGround ? maxAcceleration : maxAirAcceleration, maxSwimAcceleration, swimFactor);
+				speed = Mathf.LerpUnclamped(maxSpeed, maxSwimSpeed, swimFactor);
+				xAxis = rightAxis;
+				zAxis = forwardAxis;
 			} else {
 				acceleration = OnGround ? maxAcceleration : maxAirAcceleration;
 				speed = OnGround && desiresClimbing ? maxClimbSpeed : maxSpeed;
@@ -216,9 +273,16 @@ namespace Swimming {
 			float newZ = Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
 
 			velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
+			
+			if (Swimming) {
+				float currentY = Vector3.Dot(relativeVelocity, upAxis);
+				float newY = Mathf.MoveTowards(currentY, playerInput.z * speed, maxSpeedChange);
+				velocity += upAxis * (newY - currentY);
+			}
 		}
 		
 		private bool SnapToGround() {
+			// TODO: 遇到个问题，在浅水处跳起，因为刚离开水，stepsSinceLastGrounded还是1，但stepsSinceLastJump已经大于2了，然后探针射线又太长，这导致跳出水面马上被Snap了。
 			if (stepsSinceLastGrounded > 1 || stepsSinceLastJump <= 2) {
 				return false;
 			}
@@ -226,7 +290,7 @@ namespace Swimming {
 			if (speed > maxSnapSpeed) {
 				return false;
 			}
-			if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask)) {
+			if (!Physics.Raycast(body.position, -upAxis, out RaycastHit hit, probeDistance, probeMask, QueryTriggerInteraction.Ignore)) {
 				return false;
 			}
 			float upDot = Vector3.Dot(upAxis, hit.normal);
@@ -259,7 +323,7 @@ namespace Swimming {
 			}
 			return false;
 		}
-		
+
 		private bool CheckClimbing() {
 			if (Climbing) {
 				if (climbContactCount > 1) {
@@ -275,7 +339,16 @@ namespace Swimming {
 			}
 			return false;
 		}
-
+		
+		private bool CheckSwimming() {
+			if (Swimming) {
+				groundContactCount = 0;
+				contactNormal = upAxis;
+				return true;
+			}
+			return false;
+		}
+		
 		private void OnDrawGizmos() {
 			Vector3 p = transform.position;
 			Vector3 gravity = CustomGravity.GetGravity(p, out Vector3 up);

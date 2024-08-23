@@ -239,7 +239,7 @@ MonoBehaviour:
   maxStairsAngle: 45
   maxClimbAngle: 140
   maxSnapSpeed: 100
-  probeDistance: 1
+  probeDistance: 0.6
   maxDropSpeed: 30
   maxSteepDropSpeed: 15
   probeMask:
@@ -251,5 +251,5 @@ MonoBehaviour:
   climbMask:
     serializedVersion: 2
     m_Bits: 1315
-  normalMaterial: {fileID: 0}
-  climbingMaterial: {fileID: 0}
+  normalMaterial: {fileID: 2100000, guid: 3b9e85f596fa4fcab079f54e14ebfb01, type: 2}
+  climbingMaterial: {fileID: 2100000, guid: 1a0a1913f1cd4f018a37f482a6393108, type: 2}

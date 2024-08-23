@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2513485226375655767}
   - component: {fileID: 2513485226375655766}
   - component: {fileID: 2513485226375655762}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,3 +127,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9db5fdba7dd4503bb1dc753739d4beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatToSleep: 1
+  submergenceOffset: 0.125
+  submergenceRange: 0.25
+  buoyancy: 1.1
+  buoyancyOffset: {x: 0, y: 0.01, z: 0}
+  waterDrag: 1
+  waterMask:
+    serializedVersion: 2
+    m_Bits: 16
