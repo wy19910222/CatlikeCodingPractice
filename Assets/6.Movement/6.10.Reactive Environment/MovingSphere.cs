@@ -72,7 +72,7 @@ namespace ReactiveEnvironment {
 			} else {
 				// TODO: 这里是在游泳时不允许跳跃，但一般设计应该是允许跳出水面的。
 				desiredJump |= Input.GetButtonDown("Jump");
-				desiresClimbing = Input.GetButton("Climb");
+				desiresClimbing = Input.GetButton("Climb") || Input.GetAxis("Climb") > 0;
 			}
 			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 			

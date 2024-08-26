@@ -109,7 +109,7 @@ namespace ReactiveEnvironment {
 		}
 
 		private bool ManualRotation() {
-			Vector2 input = new Vector2(-Input.GetAxis("Mouse Y") * sensitivityV, Input.GetAxis("Mouse X") * sensitivityH);
+			Vector2 input = new Vector2(Input.GetAxis("Vertical Camera") * sensitivityV, Input.GetAxis("Horizontal Camera") * sensitivityH);
 			const float e = 0.001f;
 			if (input.x < -e || input.x > e || input.y < -e || input.y > e) {
 				orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;

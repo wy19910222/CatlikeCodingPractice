@@ -58,7 +58,7 @@ namespace Climbing {
 				forwardAxis = ProjectDirectionOnPlane(Vector3.forward, upAxis);
 			}
 			desiredJump |= Input.GetButtonDown("Jump");
-			desiresClimbing = Input.GetButton("Climb");
+			desiresClimbing = Input.GetButton("Climb") || Input.GetAxis("Climb") > 0;
 			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 			
 			meshRenderer.material = Climbing ? climbingMaterial : normalMaterial;
