@@ -57,7 +57,9 @@ namespace Swimming {
 		private void Update() {
 			playerInput.x = Input.GetAxis("Horizontal");
 			playerInput.y = Input.GetAxis("Vertical");
-			// TODO: 这里设计是在水中上下移动，但一般设计应该是自然往下沉，跳一下就往上游一点。
+			// TODO: 这里设计是在水中上下游动，参考其他游戏：
+			// 奥日因为是2D，无操作自然下沉，Y轴控制上下游动，出水面后自动保持水面状态，可跳跃可下潜，
+			// 马里奥奥德赛因为是3D，不支持上下游动，无操作自然下沉，跳跃可往上游一小段，可跳出水面。
 			playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
 			playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 			if (playerInputSpace) {
