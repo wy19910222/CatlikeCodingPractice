@@ -11,7 +11,7 @@ namespace Rolling {
 	public class MovingSpherePlus : MonoBehaviour {
 		private static readonly int baseColorId = Shader.PropertyToID("_BaseColor");
 		
-		[SerializeField] private Transform playerInputSpace;
+		[SerializeField] private Transform playerInputSpace, ball;
 		[SerializeField, Range(0f, 100f)] private float maxSpeed = 10f, maxClimbSpeed = 4f, maxSwimSpeed = 5f;
 		[SerializeField, Range(0f, 100f)] private float maxAcceleration = 80f, maxAirAcceleration = 20f, maxClimbAcceleration = 40f, maxSwimAcceleration = 5f;
 		[SerializeField, Range(0f, 10f)] private float jumpHeight = 3f;
@@ -28,7 +28,10 @@ namespace Rolling {
 		[SerializeField, Range(2f, 100f)] private float maxDropSpeed = 30F, maxSteepDropSpeed = 3F;
 		[SerializeField] private LayerMask probeMask = -1, stairsMask = -1, climbMask = -1, waterMask = 0;
 		[SerializeField] private Material normalMaterial, climbingMaterial, swimmingMaterial;
-	
+		[SerializeField, Min(0.1f)] private float ballRadius = 0.5f;
+		[SerializeField, Min(0f)] private float ballAlignSpeed = 180f;
+		[SerializeField, Min(0f)] private float ballAirRotation = 0.5f, ballSwimRotation = 2f;
+
 		private Vector3 playerInput;
 		private Vector3 velocity, connectionVelocity;
 		private Rigidbody body, connectedBody, previousConnectedBody;
@@ -42,6 +45,7 @@ namespace Rolling {
 		private Vector3 connectionWorldPosition, connectionLocalPosition;
 		private MeshRenderer meshRenderer;
 		private float submergence;
+		private Vector3 lastContactNormal, lastSteepNormal, lastConnectionVelocity;
 		
 		private bool OnGround => groundContactCount > 0;
 		private bool OnSteep => steepContactCount > 0;
@@ -58,17 +62,17 @@ namespace Rolling {
 		private void Awake() {
 			body = GetComponent<Rigidbody>();
 			body.useGravity = false;
-			meshRenderer = GetComponent<MeshRenderer>();
+			meshRenderer = ball.GetComponent<MeshRenderer>();
 			OnValidate();
 		}
 
 		private void Update() {
 			playerInput.x = Input.GetAxis("Horizontal");
-			playerInput.y = Input.GetAxis("Vertical");
+			playerInput.z = Input.GetAxis("Vertical");
 			// TODO: 这里设计是在水中上下游动，参考其他游戏：
 			// 奥日因为是2D，无操作自然下沉，Y轴控制上下游动，出水面后自动保持水面状态，可跳跃可下潜，
 			// 马里奥奥德赛因为是3D，不支持上下游动，无操作自然下沉，跳跃可往上游一小段，可跳出水面。
-			playerInput.z = Swimming ? Input.GetAxis("UpDown") : 0f;
+			playerInput.y = Swimming ? Input.GetAxis("UpDown") : 0f;
 			playerInput = Vector3.ClampMagnitude(playerInput, 1f);
 			if (playerInputSpace) {
 				rightAxis = ProjectDirectionOnPlane(playerInputSpace.right, upAxis);
@@ -86,7 +90,60 @@ namespace Rolling {
 			}
 			GetComponent<Renderer>().material.SetColor(baseColorId, Color.white * (groundContactCount * 0.25f));
 			
-			meshRenderer.material = Climbing ? climbingMaterial : Swimming ? swimmingMaterial : normalMaterial;
+			UpdateBall();
+		}
+
+		private void UpdateBall() {
+			Material ballMaterial = normalMaterial;
+			Vector3 rotationPlaneNormal = lastContactNormal;
+			float rotationFactor = 1f;
+			if (Climbing) {
+				ballMaterial = climbingMaterial;
+			} else if (Swimming) {
+				ballMaterial = swimmingMaterial;
+				rotationFactor = ballSwimRotation;
+			} else if (!OnGround) {
+				if (OnSteep) {
+					rotationPlaneNormal = lastSteepNormal;
+				} else {
+					rotationFactor = ballAirRotation;
+				}
+			}
+			meshRenderer.material = ballMaterial;
+			Vector3 movement = (body.velocity - lastConnectionVelocity) * Time.deltaTime;
+			movement -= rotationPlaneNormal * Vector3.Dot(movement, rotationPlaneNormal);
+			float distance = movement.magnitude;
+			Quaternion rotation = ball.localRotation;
+			if (connectedBody && connectedBody == previousConnectedBody) {
+				rotation = Quaternion.Euler(connectedBody.angularVelocity * (Mathf.Rad2Deg * Time.deltaTime)) * rotation;
+				if (distance < 0.001f) {
+					ball.localRotation = rotation;
+					return;
+				}
+			} else if (distance < 0.001f) {
+				return;
+			}
+			float angle = distance * rotationFactor * (180f / Mathf.PI) / ballRadius;
+			Vector3 rotationAxis = Vector3.Cross(rotationPlaneNormal, movement).normalized;
+			rotation = Quaternion.Euler(rotationAxis * angle) * rotation;
+			if (ballAlignSpeed > 0f) {
+				rotation = AlignBallRotation(rotationAxis, rotation, distance);
+			}
+			ball.localRotation = rotation;
+		}
+
+		private Quaternion AlignBallRotation(Vector3 rotationAxis, Quaternion rotation, float traveledDistance) {
+			Vector3 ballAxis = ball.up;
+			float dot = Mathf.Clamp(Vector3.Dot(ballAxis, rotationAxis), -1f, 1f);
+			float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+			float maxAngle = ballAlignSpeed * traveledDistance;
+
+			Quaternion newAlignment = Quaternion.FromToRotation(ballAxis, rotationAxis) * rotation;
+			if (angle <= maxAngle) {
+				return newAlignment;
+			} else {
+				return Quaternion.SlerpUnclamped(rotation, newAlignment, maxAngle / angle);
+			}
 		}
 		
 		private void FixedUpdate() {
@@ -121,6 +178,10 @@ namespace Rolling {
 		}
 
 		private void ClearState() {
+			lastContactNormal = contactNormal;
+			lastSteepNormal = steepNormal;
+			lastConnectionVelocity = connectionVelocity;
+
 			groundContactCount = steepContactCount = climbContactCount = 0;
 			contactNormal = steepNormal = climbNormal = Vector3.zero;
 			connectionVelocity = Vector3.zero;
@@ -291,21 +352,16 @@ namespace Rolling {
 			xAxis = ProjectDirectionOnPlane(xAxis, contactNormal);
 			zAxis = ProjectDirectionOnPlane(zAxis, contactNormal);
 
-			Vector3 relativeVelocity = velocity - connectionVelocity;
-			float currentX = Vector3.Dot(relativeVelocity, xAxis);
-			float currentZ = Vector3.Dot(relativeVelocity, zAxis);
-
 			// TODO: 在地面上，放开摇杆应该停下来，但是在空中，放开摇杆应该保持当前的运动状态才对
-			float maxSpeedChange = acceleration * Time.deltaTime;
-			float newX = Mathf.MoveTowards(currentX, playerInput.x * speed, maxSpeedChange);
-			float newZ = Mathf.MoveTowards(currentZ, playerInput.y * speed, maxSpeedChange);
-
-			velocity += xAxis * (newX - currentX) + zAxis * (newZ - currentZ);
-			
+			Vector3 relativeVelocity = velocity - connectionVelocity;
+			Vector3 adjustment;
+			adjustment.x = playerInput.x * speed - Vector3.Dot(relativeVelocity, xAxis);
+			adjustment.z = playerInput.z * speed - Vector3.Dot(relativeVelocity, zAxis);
+			adjustment.y = Swimming ? playerInput.y * speed - Vector3.Dot(relativeVelocity, upAxis) : 0f;
+			adjustment = Vector3.ClampMagnitude(adjustment, acceleration * Time.deltaTime);
+			velocity += xAxis * adjustment.x + zAxis * adjustment.z;
 			if (Swimming) {
-				float currentY = Vector3.Dot(relativeVelocity, upAxis);
-				float newY = Mathf.MoveTowards(currentY, playerInput.z * speed, maxSpeedChange);
-				velocity += upAxis * (newY - currentY);
+				velocity += upAxis * adjustment.y;
 			}
 		}
 		
