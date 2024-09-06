@@ -6,14 +6,14 @@ namespace Rolling {
 
 		private void OnTriggerEnter(Collider other) {
 			Rigidbody body = other.attachedRigidbody;
-			if (body) {
+			if (body && acceleration <= 0f) {
 				Accelerate(body);
 			}
 		}
 		
 		private void OnTriggerStay(Collider other) {
 			Rigidbody body = other.attachedRigidbody;
-			if (body) {
+			if (body && acceleration > 0f) {
 				Accelerate(body);
 			}
 		}
