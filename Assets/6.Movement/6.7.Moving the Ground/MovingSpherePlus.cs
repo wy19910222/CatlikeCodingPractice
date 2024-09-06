@@ -140,7 +140,7 @@ namespace MovingTheGround {
 			if (velocity.y < 0) {
 				velocity.y = 0;
 			}
-			float jumpSpeed = Mathf.Sqrt(- 2f * gravity.y * jumpHeight);
+			float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
 			jumpDirection = (jumpDirection + upAxis).normalized;
 			float alignedSpeed = Vector3.Dot(velocity, jumpDirection);
 			if (alignedSpeed > 0f) {

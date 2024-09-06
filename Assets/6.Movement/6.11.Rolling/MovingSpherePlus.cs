@@ -241,7 +241,7 @@ namespace Rolling {
 			if (velocity.y < 0) {
 				velocity.y = 0;
 			}
-			float jumpSpeed = Mathf.Sqrt(- 2f * gravity.y * jumpHeight);
+			float jumpSpeed = Mathf.Sqrt(2f * gravity.magnitude * jumpHeight);
 			if (InWater) {
 				jumpSpeed *= Mathf.Max(0f, 1f - submergence / swimThreshold);
 			}

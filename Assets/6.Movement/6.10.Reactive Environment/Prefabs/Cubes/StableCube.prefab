@@ -140,3 +140,4 @@ MonoBehaviour:
   waterMask:
     serializedVersion: 2
     m_Bits: 16
+  safeFloating: 1
