@@ -42,7 +42,7 @@ namespace CustomPlus {
 		[SerializeField] private float submergenceOffset = 0.5f;
 		[SerializeField, Min(0.1f)] private float submergenceRange = 1f;
 		[SerializeField, Min(0f)] private float buoyancy = 1f;
-		[SerializeField, Range(0.01f, 1f)] private float driftThreshold = 0.3f;	// 漂浮阈值，浸没程度大于该阈值为漂浮
+		[SerializeField, Range(0.01f, 1f)] private float floatThreshold = 0.3f;	// 漂浮阈值，浸没程度大于该阈值为漂浮
 		[SerializeField, Range(0.01f, 1f)] private float diveThreshold = 0.95f;	// 潜水阈值，浸没程度大于该阈值为潜水
 		[SerializeField] private bool freeDiving;	// 是否自由潜水（摇杆第3轴控制上下移动）
 		[SerializeField, Range(0f, 100f)] private float maxSwimSpeed = 5f;
@@ -50,11 +50,11 @@ namespace CustomPlus {
 		[SerializeField, Range(0f, 10f)] private float divingJumpHeight = 1f;	// 非自由潜水模式下，潜水时跳跃高度（往上游一下高度）
 		[SerializeField, Range(0f, 10f)] private float waterDrag = 1f;
 		[SerializeField, Range(0f, 1f)] private float waterJumpDrag;	// 在水中跳跃受到的阻力
-		[SerializeField, Min(0f)] private float driftAlignMaxSpeed = 100f;	// 漂浮状态下高度修正速度
-		[SerializeField, Min(0f)] private float driftAlignAcceleration = 15f;	// 漂浮状态下高度修正加速度
+		[SerializeField, Min(0f)] private float floatAlignMaxSpeed = 100f;	// 漂浮状态下高度修正速度
+		[SerializeField, Min(0f)] private float floatAlignAcceleration = 15f;	// 漂浮状态下高度修正加速度
 		[SerializeField] private bool divingClimbable;	// 潜水状态是否允许攀爬
 		[SerializeField] private LayerMask waterMask = 0;
-		[SerializeField] private Material driftingMaterial;
+		[SerializeField] private Material floatingMaterial;
 		[SerializeField] private Material divingMaterial;
 		
 		[Header("Rolling")]
@@ -95,8 +95,8 @@ namespace CustomPlus {
 		private bool OnSteep => steepContactCount > 0;
 		private bool Climbing => climbContactCount > 0 && stepsSinceLastJump > 2;
 		private bool InWater => submergence > 0f;
-		private bool Swimming => Diving || Drifting;
-		private bool Drifting => submergence >= driftThreshold && submergence < diveThreshold;
+		private bool Swimming => Diving || Floating;
+		private bool Floating => submergence >= floatThreshold && submergence < diveThreshold;
 		private bool Diving => submergence >= diveThreshold;
 
 		private void OnValidate () {
@@ -104,7 +104,7 @@ namespace CustomPlus {
 			minStairsDotProduct = Mathf.Cos(maxStairsAngle * Mathf.Deg2Rad);
 			minClimbDotProduct = Mathf.Cos(maxClimbAngle * Mathf.Deg2Rad);
 			maxDetourDotProduct = Mathf.Cos(minDetourAngle * Mathf.Deg2Rad);
-			driftThreshold = Mathf.Min(driftThreshold, diveThreshold);
+			floatThreshold = Mathf.Min(floatThreshold, diveThreshold);
 		}
 
 		private void Awake() {
@@ -360,14 +360,13 @@ namespace CustomPlus {
 			if (Climbing) {
 				velocity -= contactNormal * (maxClimbAcceleration * 0.9f * Time.deltaTime);
 			} else if (InWater) {
-				if (Drifting) {
+				if (Floating) {
 					if (freeDiving && playerInput.y >= 0 || !freeDiving && playerInput != Vector3.zero) {
 						// 水面漂浮状态，移动可保持漂浮
-						float driftRange = diveThreshold - driftThreshold;
-						float percent = (submergence - driftThreshold) / driftRange * 2 - 1;
-						float desiredUpVelocity = percent * Time.deltaTime * driftAlignMaxSpeed;
+						float percent = (submergence - floatThreshold) / (diveThreshold - floatThreshold) * 2 - 1;
+						float desiredUpVelocity = percent * Time.deltaTime * floatAlignMaxSpeed;
 						float upVelocity = Vector3.Dot(velocity, upAxis);
-						velocity += upAxis * Mathf.MoveTowards(0, desiredUpVelocity - upVelocity, driftAlignAcceleration * Time.deltaTime);
+						velocity += upAxis * Mathf.MoveTowards(0, desiredUpVelocity - upVelocity, floatAlignAcceleration * Time.deltaTime);
 					} else {
 						// 水面漂浮状态，静止会缓慢下沉
 						velocity += gravity * ((1f - buoyancy * submergence) * Time.deltaTime);
@@ -495,8 +494,8 @@ namespace CustomPlus {
 			float rotationFactor = 1f;
 			if (Climbing) {
 				ballMaterial = climbingMaterial;
-			} else if (Drifting) {
-				ballMaterial = driftingMaterial;
+			} else if (Floating) {
+				ballMaterial = floatingMaterial;
 				rotationFactor = ballSwimRotation;
 			} else if (Diving) {
 				ballMaterial = divingMaterial;
