@@ -206,7 +206,7 @@ namespace Climbing {
 					}
 				}
 			}
-			if (Mathf.Approximately(expectClimbRightDot, float.MinValue)) {
+			if (!Mathf.Approximately(expectClimbRightDot, float.MinValue)) {
 				lastClimbNormal = expectClimbNormal;
 			}
 		}
