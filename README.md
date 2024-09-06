@@ -25,6 +25,7 @@
 [**Assets/6.Movement**](Assets/6.Movement)  
 这篇是讲第三人称——小球的运动控制的，包括角色的基础运动、攀爬、与水交互。另外还有摄像机控制、特殊重力、可交互物体等。  
 ![Preview](Assets/6.Movement/Captures~/Preview.png)  
+  
 [**Assets/6.Movement/6.12.CustomPlus**](Assets/6.Movement/6.12.CustomPlus)  
 这个文件夹是我在学完的基础上继续扩展了小球运动，脚本叫 [**MovingSpherePlus**](Assets/6.Movement/6.12.CustomPlus/MovingSpherePlus.cs) ，主要做了以下修改：  
 * 跳跃高度  
