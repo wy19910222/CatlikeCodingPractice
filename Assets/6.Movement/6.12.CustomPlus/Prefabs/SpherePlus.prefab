@@ -277,7 +277,7 @@ MonoBehaviour:
     m_Bits: 16
   normalMaterial: {fileID: 2100000, guid: a66a2518fbec44c486d73924a700d354, type: 2}
   climbingMaterial: {fileID: 2100000, guid: 062164dd6bed48f1aef3596cc7044362, type: 2}
-  driftingMaterial: {fileID: 2100000, guid: 8eadadf6415ac6945a8f27d94c62cf6c, type: 2}
+  floatingMaterial: {fileID: 2100000, guid: 8eadadf6415ac6945a8f27d94c62cf6c, type: 2}
   divingMaterial: {fileID: 2100000, guid: 99ba0634ec604934801aa0221e0c5900, type: 2}
   ballRadius: 0.5
   ballAlignSpeed: 45
